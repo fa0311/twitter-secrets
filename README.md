@@ -13,6 +13,8 @@ Rotate cookies or proxies here once instead of in every repository's secrets.
 | `.sops.yaml` | recipients: CI age key + maintainer PGP key `EAB5AF5AA7ED7A16C4027B5283A8A5E74872A8AA` |
 | `action.yml` | composite action that decrypts everything inside a workflow |
 
+`proxy_list` is ordered fastest first (measured bundle download speed), so a job that needs one stable proxy can take the first line; jobs that spread load can pick at random.
+
 ## Use from GitHub Actions
 
 Add the age private key as the `SOPS_AGE_KEY` secret of the consuming repository, then:
