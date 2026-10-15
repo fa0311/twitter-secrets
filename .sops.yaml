@@ -1,0 +1,7 @@
+creation_rules:
+  - path_regex: secrets\.enc\.yaml$
+    key_groups:
+      - age:
+          - age189qr0gjxgqsgu6m8hgqrsnprwqe8654wedynwm9jdwvha8gemq8s9n8sf5
+        pgp:
+          - EAB5AF5AA7ED7A16C4027B5283A8A5E74872A8AA

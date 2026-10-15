@@ -1,0 +1,41 @@
+name: twitter-secrets
+description: Decrypt the shared X/Twitter credentials (sops + age) and expose them to the job
+inputs:
+  age-key:
+    description: age private key (store it as the SOPS_AGE_KEY secret in each repository)
+    required: true
+  cookie-path:
+    description: where to write the X session cookies (browser extension JSON format)
+    required: false
+    default: cookie.json
+  sops-version:
+    description: sops release to install
+    required: false
+    default: v3.13.3
+outputs:
+  cookie-path:
+    description: path of the written cookie file
+    value: ${{ steps.decrypt.outputs.cookie-path }}
+runs:
+  using: composite
+  steps:
+    - name: Install sops
+      shell: bash
+      run: |
+        curl -fsSL -o /usr/local/bin/sops "https://github.com/getsops/sops/releases/download/${{ inputs.sops-version }}/sops-${{ inputs.sops-version }}.linux.amd64"
+        chmod +x /usr/local/bin/sops
+    - name: Decrypt
+      id: decrypt
+      shell: bash
+      env:
+        SOPS_AGE_KEY: ${{ inputs.age-key }}
+        SECRETS_FILE: ${{ github.action_path }}/secrets.enc.yaml
+      run: |
+        sops decrypt --extract '["cookie_json"]' "$SECRETS_FILE" > "${{ inputs.cookie-path }}"
+        echo "cookie-path=${{ inputs.cookie-path }}" >> "$GITHUB_OUTPUT"
+        {
+          echo "PROXY_LIST<<__EOF__"
+          sops decrypt --extract '["proxy_list"]' "$SECRETS_FILE"
+          echo "__EOF__"
+        } >> "$GITHUB_ENV"
+        echo "::add-mask::$(sops decrypt --extract '["proxy_list"]' "$SECRETS_FILE" | tr '\n' ' ')"
