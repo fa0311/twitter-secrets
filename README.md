@@ -8,7 +8,7 @@ Rotate cookies or proxies here once instead of in every repository's secrets.
 
 | file | what |
 | --- | --- |
-| `secrets.enc.yaml` | `cookie_json` (X session cookies, browser extension JSON format) and `proxy_list` (`host:port:user:pass` per line) |
+| `secrets.enc.yaml` | `cookie_json` (X session cookies, browser extension JSON format) and `proxy_list` (one proxy URL per line, e.g. `socks5h://user:pass@host:1080`; legacy `host:port:user:pass` means HTTP) |
 | `keys-ci-age.txt.gpg` | the CI age private key, encrypted to the maintainer's PGP key |
 | `.sops.yaml` | recipients: CI age key + maintainer PGP key `EAB5AF5AA7ED7A16C4027B5283A8A5E74872A8AA` |
 | `action.yml` | composite action that decrypts everything inside a workflow |
