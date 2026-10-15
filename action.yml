@@ -32,10 +32,13 @@ runs:
         SECRETS_FILE: ${{ github.action_path }}/secrets.enc.yaml
       run: |
         sops decrypt --extract '["cookie_json"]' "$SECRETS_FILE" > "${{ inputs.cookie-path }}"
+        jq -r '.[].value' "${{ inputs.cookie-path }}" | while read -r value; do echo "::add-mask::$value"; done
         echo "cookie-path=${{ inputs.cookie-path }}" >> "$GITHUB_OUTPUT"
+        sops decrypt --extract '["proxy_list"]' "$SECRETS_FILE" > /tmp/proxy_list
+        while read -r line; do [ -n "$line" ] && echo "::add-mask::$line"; done < /tmp/proxy_list
         {
           echo "PROXY_LIST<<__EOF__"
-          sops decrypt --extract '["proxy_list"]' "$SECRETS_FILE"
+          cat /tmp/proxy_list
           echo "__EOF__"
         } >> "$GITHUB_ENV"
-        echo "::add-mask::$(sops decrypt --extract '["proxy_list"]' "$SECRETS_FILE" | tr '\n' ' ')"
+        rm /tmp/proxy_list
